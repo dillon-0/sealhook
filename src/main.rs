@@ -321,8 +321,9 @@ fn encrypt(cfg: &Config, force: bool, stage: bool) -> Result<i32> {
 fn decrypt(cfg: &Config, force: bool) -> Result<i32> {
     ensure_age_engine(cfg)?;
     if find_identity(&cfg.age, &cfg.base).is_none() {
-        eprintln!("skip decrypt: no age identity file found; set AGE_IDENTITY_FILE or create configured key file");
-        return Ok(0);
+        return Err(anyhow!(
+            "no age identity file found; set AGE_IDENTITY_FILE or create configured key file"
+        ));
     }
 
     let mut rc = 0;

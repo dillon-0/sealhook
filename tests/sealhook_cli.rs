@@ -108,6 +108,21 @@ pattern = "config/**/*.env"
 }
 
 #[test]
+fn decrypt_fails_when_no_age_identity_found() {
+    let dir = tempdir().unwrap();
+    write_minimal_config(dir.path());
+    fs::write(dir.path().join(".env.age"), "AGE-ENCRYPTED").unwrap();
+
+    let mut cmd = Command::cargo_bin("sealhook").unwrap();
+    cmd.current_dir(dir.path())
+        .env("HOME", dir.path().join("empty-home"))
+        .arg("decrypt")
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("no age identity file found"));
+}
+
+#[test]
 fn encrypt_and_decrypt_round_trip_through_system_age_cli() {
     let dir = tempdir().unwrap();
     write_minimal_config(dir.path());
